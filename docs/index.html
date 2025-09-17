@@ -1,183 +1,736 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="dark">
-
+<html lang="pt-br" class="dark">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Supabase Edge Functions - Implante JavaScript globalmente em segundos</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
-  <style>
-    :root {
-      --brand-color: #3ecf8e;
-      --background-color: #0a0a0a;
-      --card-background-color: #1c1c1c;
-      --border-color: rgba(255, 255, 255, 0.1);
-      --text-primary: #f1f5f9;
-      --text-secondary: #94a3b8;
-    }
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap');
-
-    body { background-color: var(--background-color); color: var(--text-primary); font-family: 'Inter', sans-serif; }
-    .font-mono { font-family: 'Space Mono', monospace; }
-
-    .fade-in { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
-    .fade-in.visible { opacity: 1; transform: translateY(0); }
-
-    .dx-grid { display: grid; gap: 1.25rem; grid-template-areas: "localDX" "parity" "ecosystem" "ci"; }
-    @media (min-width: 768px) { .dx-grid { grid-template-areas: "localDX localDX" "parity ecosystem" "ci ci"; } }
-    @media (min-width: 1280px) { .dx-grid { grid-template-areas: "localDX localDX parity ecosystem" "ci ci ci ci"; } }
-    #grid-localDX { grid-area: localDX; } #grid-parity { grid-area: parity; } #grid-ecosystem { grid-area: ecosystem; } #grid-ci { grid-area: ci; }
-
-    .dx-card { background: #111; border: 1px solid var(--border-color); transition: all 0.3s ease; position: relative; overflow: hidden; }
-    .dx-card:before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(148, 163, 184, 0.1), transparent 40%); transition: opacity 0.5s ease; opacity: 0; }
-    .dx-card:hover:before { opacity: 1; animation: rotateGradient 8s linear infinite; }
-    @keyframes rotateGradient { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-
-    .globe-line { stroke-dasharray: 1000; stroke-dashoffset: 1000; animation: draw-line 5s forwards; }
-    .globe-dot { animation: pulse-dot 2s infinite; }
-    @keyframes draw-line { to { stroke-dashoffset: 0; } }
-    @keyframes pulse-dot { 0%, 100% { transform: scale(0.8); opacity: 0.7; } 50% { transform: scale(1.2); opacity: 1; } }
-
-    #command-line-text::after { content: '▋'; animation: blink 1s step-end infinite; color: var(--brand-color); }
-    @keyframes blink { 50% { color: transparent; } }
-
-    .tab-active { color: var(--text-primary) !important; border-color: var(--brand-color) !important; flex-grow: 2; }
-    .tab-button { transition: all 0.3s ease-in-out; }
-    .vertical-tab-active > div { background-color: var(--card-background-color) !important; color: var(--text-primary) !important; }
-
-    .feature-card { background-color: var(--card-background-color); border: 1px solid var(--border-color); transition: transform 0.3s ease, box-shadow 0.3s ease; }
-    .feature-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3), 0 0 0 1px var(--brand-color); }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pitchutcha - Funções de Borda Globais</title>
     
-    .code-highlight .token-keyword { color: #c792ea; } .code-highlight .token-string { color: #c3e88d; } .code-highlight .token-function { color: #82aaff; } .code-highlight .token-comment { color: #637777; } .code-highlight .token-punctuation { color: #89ddff; } .code-highlight .token-operator { color: #89ddff; } .code-highlight .token-number { color: #f78c6c; }
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Inter & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- SwiperJS para Carrosséis -->
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    
+    <style>
+        /* Estilos customizados e configuração do tema escuro */
+        :root {
+            --background: 240 10% 3.9%;
+            --foreground: 0 0% 98%;
+            --card: 240 10% 3.9%;
+            --card-foreground: 0 0% 98%;
+            --popover: 240 10% 3.9%;
+            --popover-foreground: 0 0% 98%;
+            --primary: 0 0% 98%;
+            --primary-foreground: 240 5.9% 10%;
+            --secondary: 240 3.7% 15.9%;
+            --secondary-foreground: 0 0% 98%;
+            --muted: 240 3.7% 15.9%;
+            --muted-foreground: 240 5% 64.9%;
+            --accent: 240 3.7% 15.9%;
+            --accent-foreground: 0 0% 98%;
+            --destructive: 0 62.8% 30.6%;
+            --destructive-foreground: 0 0% 98%;
+            --border: 240 3.7% 15.9%;
+            --input: 240 3.7% 15.9%;
+            --ring: 240 4.9% 83.9%;
+            --radius: 0.5rem;
+            --brand-color: #3ECF8E;
+        }
 
-    .npm-bg { animation: scroll-npm 60s linear infinite; }
-    @keyframes scroll-npm { from { transform: translateY(0); } to { transform: translateY(-50%); } }
-  </style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: hsl(var(--background));
+            color: hsl(var(--foreground));
+        }
+
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .h1 {
+            font-size: 3rem; /* 48px */
+            line-height: 1;
+            font-weight: 700;
+            letter-spacing: -0.05em;
+        }
+
+        @media (min-width: 1024px) {
+            .h1 {
+                font-size: 4.5rem; /* 72px */
+            }
+        }
+        
+        .h2 {
+            font-size: 2.25rem; /* 36px */
+            line-height: 2.5rem; /* 40px */
+            font-weight: 700;
+            letter-spacing: -0.025em;
+        }
+
+        /* Animações */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.8s ease-out forwards;
+            opacity: 0;
+        }
+        
+        #cli-command-text {
+            display: inline-block;
+            overflow: hidden;
+            white-space: nowrap;
+            border-right: 2px solid var(--brand-color);
+            animation: typing 2.5s steps(30, end) infinite, blink-caret .75s step-end infinite;
+        }
+
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: var(--brand-color); }
+        }
+        
+        .globe-gradient-overlay {
+             background: radial-gradient(circle at 50% 50%, rgba(10, 10, 10, 0) 40%, hsl(var(--background)) 70%);
+        }
+
+        .card-glow {
+            position: relative;
+            overflow: hidden;
+        }
+        .card-glow:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(800px circle at var(--mouse-x) var(--mouse-y), rgba(255, 255, 255, 0.06), transparent 40%);
+            z-index: 1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .card-glow:hover:before {
+            opacity: 1;
+        }
+        .card-glow > * {
+            z-index: 2;
+            position: relative;
+        }
+        
+        /* Estilos para abas interativas */
+        .tab-content {
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+        }
+        .tab-content.hidden {
+            opacity: 0;
+            transform: translateY(10px);
+            position: absolute;
+            pointer-events: none;
+        }
+    </style>
 </head>
+<body class="bg-black text-gray-200 antialiased">
 
-<body class="bg-background text-text-primary antialiased">
-
-  <header class="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border-color">
-    <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
-      <div class="flex items-center space-x-8">
-        <a href="#" class="flex items-center space-x-2"><svg role="img" viewBox="0 0 24 24" class="h-6 w-6 text-[var(--brand-color)]"><path d="M13.84 22.42c-.42.25-.96.25-1.38 0l-9.33-5.42C2.7 16.75 2 16.03 2 15.22V8.78c0-.81.7-1.53 1.13-1.78L12.46.58c.42-.25.96-.25 1.38 0l9.33 5.42c.43.25.7.97.7 1.78v6.44c0 .81-.7 1.53-1.13 1.78l-9.34 5.42zM12.15 1.9L4.47 6.3v9.4l7.68 4.44 7.68-4.44V6.3L12.15 1.9z" fill="currentColor"/></svg><span class="font-bold text-xl text-text-primary">supabase</span></a>
-        <div class="hidden lg:flex items-center space-x-1 text-sm">
-            <div class="group relative"><button class="px-3 py-2 text-text-secondary hover:text-text-primary transition flex items-center">Product <svg class="w-4 h-4 ml-1 transform transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button><div class="absolute hidden group-hover:block bg-card-background-color border border-border-color rounded-md shadow-lg w-48 mt-1 p-1"><a href="#" class="block px-3 py-2 text-sm rounded-md text-text-secondary hover:bg-background hover:text-text-primary">Database</a><a href="#" class="block px-3 py-2 text-sm rounded-md text-text-secondary hover:bg-background hover:text-text-primary">Auth</a></div></div>
-            <div class="group relative"><button class="px-3 py-2 text-text-secondary hover:text-text-primary transition flex items-center">Developers <svg class="w-4 h-4 ml-1 transform transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button><div class="absolute hidden group-hover:block bg-card-background-color border border-border-color rounded-md shadow-lg w-48 mt-1 p-1"><a href="#" class="block px-3 py-2 text-sm rounded-md text-text-secondary hover:bg-background hover:text-text-primary">Documentation</a><a href="#" class="block px-3 py-2 text-sm rounded-md text-text-secondary hover:bg-background hover:text-text-primary">API Reference</a></div></div>
-            <a href="#" class="px-3 py-2 text-text-secondary hover:text-text-primary transition">Pricing</a><a href="#" class="px-3 py-2 text-text-secondary hover:text-text-primary transition">Blog</a>
-        </div>
-      </div>
-      <div class="hidden lg:flex items-center space-x-4"><a href="#" class="flex items-center space-x-2 text-sm text-text-secondary hover:text-text-primary transition border border-border-color px-3 py-1.5 rounded-md hover:border-gray-600"><svg class="w-5 h-5" viewBox="0 0 16 16" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg><span>88.7k</span></a><a href="#" class="text-sm px-4 py-2 rounded-md text-text-primary bg-slate-700 hover:bg-slate-600 transition">Sign in</a><a href="#" class="text-sm px-4 py-2 rounded-md text-slate-900 bg-[var(--brand-color)] hover:bg-opacity-80 transition font-medium">Start your project</a></div>
-      <div class="lg:hidden"><button class="text-text-primary"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg></button></div>
-    </nav>
-  </header>
-  
-  <main>
-    <section class="relative border-b border-border-color">
-        <div class="container mx-auto px-6 pt-16 pb-24 grid lg:grid-cols-2 gap-12 items-center">
-          <div class="fade-in"><p class="text-sm font-mono text-[var(--brand-color)] mb-4">Edge Functions</p><h1 class="text-4xl md:text-6xl font-bold leading-tight tracking-tighter">Deploy JavaScript<br/> globally in seconds</h1><p class="mt-6 text-lg text-text-secondary max-w-lg">Easily author, deploy and monitor serverless functions distributed globally at the edge, close to your users.</p><div class="mt-8 flex flex-wrap gap-4"><a href="#" class="px-6 py-3 rounded-md text-slate-900 bg-[var(--brand-color)] hover:bg-opacity-80 transition font-medium">Create a free account</a><a href="#" class="px-6 py-3 rounded-md text-text-primary bg-slate-700 hover:bg-slate-600 transition font-medium">Read documentation</a></div></div>
-          <div class="relative h-96 lg:h-auto fade-in" style="--delay: 150ms;"><div class="absolute inset-0 flex items-center justify-center"><div class="relative w-full max-w-lg aspect-square"><img src="https://supabase.com/images/product/functions/globe.svg" alt="Wireframe do globo" class="w-full h-full opacity-30"/><svg class="absolute inset-0 w-full h-full" viewBox="0 0 500 500" fill="none"><path d="M250 100 L 150 250" stroke="#3ecf8e" stroke-width="2" class="globe-line" style="animation-delay: 0.5s;"/><path d="M250 100 L 350 250" stroke="#3ecf8e" stroke-width="2" class="globe-line" style="animation-delay: 1s;"/><path d="M250 100 L 250 400" stroke="#3ecf8e" stroke-width="2" class="globe-line" style="animation-delay: 1.5s;"/><circle cx="250" cy="100" r="8" fill="#3ecf8e" class="globe-dot"/><circle cx="150" cy="250" r="6" fill="#3ecf8e" class="globe-dot" style="animation-delay: 0.5s;"/><circle cx="350" cy="250" r="6" fill="#3ecf8e" class="globe-dot" style="animation-delay: 1s;"/><circle cx="250" cy="400" r="6" fill="#3ecf8e" class="globe-dot" style="animation-delay: 1.5s;"/></svg><div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-sm"><div class="bg-card-background-color/80 border border-border-color rounded-lg p-3 flex items-center space-x-2 backdrop-blur-sm"><span class="text-gray-500">$</span><span id="command-line-text" class="text-sm text-white font-mono flex-1"></span></div></div></div></div></div>
-        </div>
-    </section>
-
-    <section class="container mx-auto px-6 py-24 fade-in">
-        <div class="flex justify-between items-center mb-12"><h2 class="text-3xl md:text-4xl font-bold">What you can build with Edge Functions</h2><a href="#" class="hidden sm:block text-sm px-4 py-2 rounded-md text-text-primary bg-slate-700 hover:bg-slate-600 transition">View all examples</a></div>
-        <div class="swiper-container relative"><div class="swiper-wrapper"><div class="swiper-slide feature-card rounded-xl p-6"><h3 class="text-xl font-bold text-[var(--brand-color)]">Stripe Webhooks</h3><p class="mt-2 text-text-secondary">Listen for events from Stripe and process them securely in an edge function.</p></div><div class="swiper-slide feature-card rounded-xl p-6"><h3 class="text-xl font-bold text-[var(--brand-color)]">OG Image Generation</h3><p class="mt-2 text-text-secondary">Dynamically generate social media images for your content at the edge.</p></div><div class="swiper-slide feature-card rounded-xl p-6"><h3 class="text-xl font-bold text-[var(--brand-color)]">AI Smart Banners</h3><p class="mt-2 text-text-secondary">Integrate with OpenAI to create personalized, intelligent marketing banners.</p></div><div class="swiper-slide feature-card rounded-xl p-6"><h3 class="text-xl font-bold text-[var(--brand-color)]">Supabase Auth</h3><p class="mt-2 text-text-secondary">Interact with authenticated users directly from your edge functions.</p></div></div></div>
-    </section>
-
-    <section class="container mx-auto px-6 py-24 fade-in">
-        <h2 class="text-3xl md:text-4xl font-bold">Delightful DX from local to production</h2><p class="mt-4 text-text-secondary max-w-2xl">Edge Functions are developed using Deno, an open source JavaScript runtime that ensures maximum power and flexibility. Migrate in and out at any time with no vendor lock-in.</p>
-        <div class="mt-12 dx-grid">
-            <div id="grid-localDX" class="dx-card rounded-xl p-6 flex flex-col justify-end min-h-[400px]"><h3 class="text-xl font-semibold">First-class local dev experience</h3><p class="text-text-secondary mt-2">Write code with hot code reloading, a fast Language server for autocompletion, type checking and linting.</p></div>
-            <div id="grid-parity" class="dx-card rounded-xl p-6 flex flex-col justify-end min-h-[300px]"><h3 class="text-xl font-semibold">Dev and Prod parity</h3><p class="text-text-secondary mt-2">The open source Edge runtime runs your functions locally and in production.</p></div>
-            <div id="grid-ecosystem" class="dx-card rounded-xl p-6 flex flex-col justify-end min-h-[300px] relative"><h3 class="text-xl font-semibold">Use any NPM module</h3><p class="text-text-secondary mt-2">Tap into the 2+ million modules in the Deno and NPM ecosystem.</p><div class="absolute inset-0 opacity-10 overflow-hidden -z-10"><div class="npm-bg absolute whitespace-nowrap font-mono text-text-secondary text-xs"><div>axios lodash moment express openai stripe typescript jest</div><div>react vue svelte next nuxt astro remix solidjs qwik</div><div>eslint prettier zod io-ts class-validator</div><div>date-fns dayjs chalk commander figlet inquirer</div></div></div></div>
-            <div id="grid-ci" class="dx-card rounded-xl p-6 flex flex-col md:flex-row md:items-center gap-6"><div class="flex-1"><h3 class="text-xl font-semibold">Continuous Integration</h3><p class="text-text-secondary mt-2">Use the Supabase CLI with GitHub actions to preview and deploy your functions.</p></div><div class="flex-1 bg-black/30 rounded-lg p-4 font-mono text-xs border border-border-color"><pre class="code-highlight"><code>...</code></pre></div></div>
-        </div>
-    </section>
-
-    <section class="container mx-auto px-6 py-24 fade-in">
-        <h2 class="text-3xl md:text-4xl font-bold mb-12">Integrates seamlessly with the Supabase ecosystem</h2>
-        <div class="lg:grid lg:grid-cols-3 gap-12">
-            <div class="flex flex-col space-y-1" id="vertical-tabs-nav">
-                <button class="vertical-tab-button" data-tab="zero-config"><div class="text-left p-4 rounded-md text-text-secondary hover:bg-card-background-color hover:text-text-primary transition"><h3>Zero configuration</h3><p class="text-sm mt-1 max-h-0 opacity-0 transition-all duration-300">Pre-populated environment variables.</p></div></button>
-                <button class="vertical-tab-button" data-tab="connect-db"><div class="text-left p-4 rounded-md text-text-secondary hover:bg-card-background-color hover:text-text-primary transition"><h3>Connect to your database</h3><p class="text-sm mt-1 max-h-0 opacity-0 transition-all duration-300">Use the supabase-js client.</p></div></button>
-                <button class="vertical-tab-button" data-tab="trigger-webhook"><div class="text-left p-4 rounded-md text-text-secondary hover:bg-card-background-color hover:text-text-primary transition"><h3>Trigger via webhook</h3><p class="text-sm mt-1 max-h-0 opacity-0 transition-all duration-300">Send data on database events.</p></div></button>
+    <!-- Cabeçalho Principal -->
+    <header class="sticky top-0 z-50 w-full border-b border-gray-800 bg-black/80 backdrop-blur-md">
+        <nav class="container mx-auto px-6 lg:px-16 xl:px-20 h-16 flex items-center justify-between">
+            <div class="flex items-center">
+                <a href="#" class="flex items-center space-x-2">
+                    <svg role="img" aria-label="Logo da Pitchutcha" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="text-[--brand-color]">
+                        <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span class="font-bold text-xl text-white">Pitchutcha</span>
+                </a>
+                <div class="hidden lg:flex items-center ml-8 space-x-4">
+                    <a href="#" class="text-sm text-gray-400 hover:text-white transition-colors">Produto</a>
+                    <a href="#" class="text-sm text-gray-400 hover:text-white transition-colors">Desenvolvedores</a>
+                    <a href="#" class="text-sm text-gray-400 hover:text-white transition-colors">Preços</a>
+                    <a href="#" class="text-sm text-gray-400 hover:text-white transition-colors">Documentação</a>
+                </div>
             </div>
-            <div class="lg:col-span-2 mt-8 lg:mt-0"><div id="zero-config" class="vertical-tab-content bg-card-background-color rounded-lg p-4 border border-border-color font-mono text-sm"><pre class="code-highlight"><code>...</code></pre></div><div id="connect-db" class="vertical-tab-content hidden ...">...</div><div id="trigger-webhook" class="vertical-tab-content hidden ...">...</div></div>
+            <div class="hidden lg:flex items-center space-x-2">
+                <button class="px-4 py-2 text-sm rounded-md bg-gray-900 hover:bg-gray-800 border border-gray-700 transition-colors">Entrar</button>
+                <button class="px-4 py-2 text-sm rounded-md bg-[--brand-color] text-black font-semibold hover:bg-opacity-80 transition-opacity">Comece seu projeto</button>
+            </div>
+            <div class="lg:hidden">
+                <button id="mobile-menu-button" class="text-gray-400 hover:text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Sub-Navegação de Produtos -->
+        <div class="sticky top-16 z-40 bg-black/80 backdrop-blur-md border-b border-gray-900">
+            <div class="container mx-auto px-6 lg:px-16 xl:px-20 flex items-center space-x-6 overflow-x-auto">
+                <a href="#" class="flex items-center gap-2 py-3 text-sm text-gray-400 hover:text-white border-b-2 border-transparent hover:border-[--brand-color] transition-colors">Database</a>
+                <a href="#" class="flex items-center gap-2 py-3 text-sm text-gray-400 hover:text-white border-b-2 border-transparent hover:border-[--brand-color] transition-colors">Auth</a>
+                <a href="#" class="flex items-center gap-2 py-3 text-sm text-gray-400 hover:text-white border-b-2 border-transparent hover:border-[--brand-color] transition-colors">Storage</a>
+                <a href="#" class="flex items-center gap-2 py-3 text-sm text-white border-b-2 border-[--brand-color] transition-colors">Edge Functions</a>
+                <a href="#" class="flex items-center gap-2 py-3 text-sm text-gray-400 hover:text-white border-b-2 border-transparent hover:border-[--brand-color] transition-colors">Realtime</a>
+            </div>
         </div>
-    </section>
+        
+        <!-- Seção Hero -->
+        <section class="relative py-24 md:py-32 border-b border-gray-900 overflow-hidden">
+            <div class="container mx-auto px-6 lg:px-16 xl:px-20 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                <div class="lg:col-span-6 z-10">
+                    <p class="font-mono uppercase text-sm text-[--brand-color] mb-4">Funções de Borda</p>
+                    <h1 class="h1 text-white leading-tight">
+                        Execute JavaScript<br/>globalmente em segundos
+                    </h1>
+                    <p class="mt-6 text-lg text-gray-400 max-w-lg">
+                        Crie, implante e monitore facilmente funções serverless distribuídas globalmente na borda, perto de seus usuários.
+                    </p>
+                    <div class="mt-8 flex flex-wrap gap-4">
+                        <button class="px-6 py-3 text-base rounded-md bg-[--brand-color] text-black font-semibold hover:bg-opacity-80 transition-opacity">Crie uma conta gratuita</button>
+                        <button class="px-6 py-3 text-base rounded-md bg-gray-900 hover:bg-gray-800 border border-gray-700 transition-colors">Ler documentação</button>
+                    </div>
+                </div>
+                <div class="lg:col-span-6 h-96 lg:h-auto lg:absolute lg:top-0 lg:right-0 lg:w-1/2 lg:h-full">
+                     <div class="absolute inset-0 flex items-center justify-center">
+                         <div class="relative w-[600px] h-[600px] lg:w-[800px] lg:h-[800px]">
+                            <canvas id="globe-canvas" class="w-full h-full"></canvas>
+                             <div class="absolute inset-0 globe-gradient-overlay"></div>
+                             <div class="absolute w-full top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex justify-center z-20 px-10">
+                                 <div id="cli-command" class="w-full max-w-md group bg-black/50 backdrop-blur-sm rounded-lg border border-gray-700 p-3 flex items-center space-x-3 shadow-2xl shadow-black/50">
+                                     <span class="font-mono text-gray-500">$</span>
+                                     <span id="cli-command-text" class="font-mono text-gray-200 text-sm flex-1">pitchutcha functions deploy hello-world</span>
+                                     <button class="text-gray-500 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg>
+                                     </button>
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
+                </div>
+            </div>
+        </section>
 
-    <section class="container mx-auto px-6 py-24 fade-in">
-        <div class="grid lg:grid-cols-3 gap-12 items-center"><div class="lg:col-span-1"><h2 class="text-3xl md:text-4xl font-bold">Global presence</h2><p class="mt-4 text-text-secondary">Edge Functions run server-side logic geographically close to users, offering low latency and great performance.</p></div><div class="lg:col-span-2 grid md:grid-cols-3 gap-8 text-sm"><div class="border-t border-border-color pt-4"><h4>Global distribution</h4><p class="text-text-secondary mt-1">Run globally or pin to your database's region.</p></div><div class="border-t border-border-color pt-4"><h4>Automatic scaling</h4><p class="text-text-secondary mt-1">Seamlessly scale with usage without manual tuning.</p></div><div class="border-t border-border-color pt-4"><h4>Secure</h4><p class="text-text-secondary mt-1">SSL, Firewall and DDOS protection built in.</p></div></div></div>
-    </section>
+        <!-- Seção de Vantagens -->
+        <section class="py-24 bg-black">
+            <div class="container mx-auto px-6 lg:px-16 xl:px-20">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div class="scroll-animate">
+                        <div class="bg-gray-900/50 border border-gray-800 rounded-lg w-12 h-12 flex items-center justify-center mb-4">
+                           <svg class="w-6 h-6 text-[--brand-color]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        </div>
+                        <h3 class="font-semibold text-lg text-white">Totalmente gerenciado</h3>
+                        <p class="text-gray-400 mt-2">As Funções de Borda escalam automaticamente, reduzindo sua carga de devops.</p>
+                    </div>
+                    <div class="scroll-animate" style="animation-delay: 0.1s;">
+                        <div class="bg-gray-900/50 border border-gray-800 rounded-lg w-12 h-12 flex items-center justify-center mb-4">
+                           <svg class="w-6 h-6 text-[--brand-color]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9V3m-3.5 14.5a9 9 0 01-2.07-5.52m-2.07 5.52a9 9 0 00-2.07-5.52m-2.07 5.52V3m2.07 14.5a9 9 0 002.07-5.52"></path></svg>
+                        </div>
+                        <h3 class="font-semibold text-lg text-white">Implantações globais</h3>
+                        <p class="text-gray-400 mt-2">Implante mundialmente para máxima resiliência e baixa latência.</p>
+                    </div>
+                    <div class="scroll-animate" style="animation-delay: 0.2s;">
+                        <div class="bg-gray-900/50 border border-gray-800 rounded-lg w-12 h-12 flex items-center justify-center mb-4">
+                           <svg class="w-6 h-6 text-[--brand-color]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+                        </div>
+                        <h3 class="font-semibold text-lg text-white">Seguro e Escalável</h3>
+                        <p class="text-gray-400 mt-2">Simplesmente escreva seu código em TypeScript e implante com confiança.</p>
+                    </div>
+                    <div class="scroll-animate" style="animation-delay: 0.3s;">
+                        <div class="bg-gray-900/50 border border-gray-800 rounded-lg w-12 h-12 flex items-center justify-center mb-4">
+                           <svg class="w-6 h-6 text-[--brand-color]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                        <h3 class="font-semibold text-lg text-white">Suporte a Node.js</h3>
+                        <p class="text-gray-400 mt-2">Migre cargas de trabalho existentes, com suporte para Node e módulos NPM.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção Citação -->
+        <section class="py-24 text-center">
+            <div class="container mx-auto px-6 lg:px-16 xl:px-20 scroll-animate">
+                <blockquote class="text-2xl md:text-3xl lg:text-4xl text-white max-w-4xl mx-auto italic">
+                    “A Pitchutcha nos deu a flexibilidade e a escalabilidade necessárias em todas as fases de crescimento. É raro encontrar uma ferramenta que funcione tão bem para startups quanto para operações de grande escala.”
+                </blockquote>
+                <div class="mt-8">
+                    <img src="https://placehold.co/40x40/3ECF8E/000000?text=ZR" alt="Foto de Zeno Rocha" class="w-10 h-10 rounded-full mx-auto">
+                    <p class="mt-4 text-white font-semibold">Zeno Rocha</p>
+                    <p class="text-gray-400 font-mono text-sm">CEO na Resend</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Seção "O que você pode construir" -->
+        <section class="py-24 bg-black">
+            <div class="container mx-auto px-6 lg:px-16 xl:px-20 scroll-animate">
+                <div class="flex justify-between items-end mb-12">
+                    <h2 class="h2 text-white max-w-md">O que você pode construir com Funções de Borda</h2>
+                    <div class="hidden md:flex items-center space-x-2">
+                        <button class="carousel-prev p-2 rounded-full border border-gray-700 hover:bg-gray-800 transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                        </button>
+                        <button class="carousel-next p-2 rounded-full border border-gray-700 hover:bg-gray-800 transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="swiper-container build-carousel">
+                    <div class="swiper-wrapper">
+                        <div class="swiper-slide">
+                            <div class="bg-gray-900/40 border border-gray-800 rounded-xl overflow-hidden h-full flex flex-col">
+                                <img src="https://placehold.co/600x400/111827/334155?text=Webhooks" alt="Webhooks" class="w-full h-40 object-cover">
+                                <div class="p-6 flex-grow">
+                                    <h3 class="font-semibold text-white">Webhooks</h3>
+                                    <p class="text-gray-400 mt-2 text-sm">Receba e processe webhooks de serviços de terceiros como Stripe ou GitHub.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="swiper-slide">
+                            <div class="bg-gray-900/40 border border-gray-800 rounded-xl overflow-hidden h-full flex flex-col">
+                                <img src="https://placehold.co/600x400/111827/334155?text=API" alt="API" class="w-full h-40 object-cover">
+                                <div class="p-6 flex-grow">
+                                    <h3 class="font-semibold text-white">APIs Personalizadas</h3>
+                                    <p class="text-gray-400 mt-2 text-sm">Crie endpoints de API para seu aplicativo, como um feed de atividades em tempo real.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="swiper-slide">
+                            <div class="bg-gray-900/40 border border-gray-800 rounded-xl overflow-hidden h-full flex flex-col">
+                                <img src="https://placehold.co/600x400/111827/334155?text=Auth" alt="Auth" class="w-full h-40 object-cover">
+                                <div class="p-6 flex-grow">
+                                    <h3 class="font-semibold text-white">Lógica de Autenticação</h3>
+                                    <p class="text-gray-400 mt-2 text-sm">Integre-se com provedores de autenticação externos ou implemente sua própria lógica.</p>
+                                </div>
+                            </div>
+                        </div>
+                         <div class="swiper-slide">
+                            <div class="bg-gray-900/40 border border-gray-800 rounded-xl overflow-hidden h-full flex flex-col">
+                                <img src="https://placehold.co/600x400/111827/334155?text=IA" alt="IA" class="w-full h-40 object-cover">
+                                <div class="p-6 flex-grow">
+                                    <h3 class="font-semibold text-white">Integrações com IA</h3>
+                                    <p class="text-gray-400 mt-2 text-sm">Execute inferências de modelos de IA, crie embeddings ou interaja com APIs como a da OpenAI.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção de DX -->
+        <section class="py-24">
+             <div class="container mx-auto px-6 lg:px-16 xl:px-20">
+                <div class="text-center max-w-3xl mx-auto scroll-animate">
+                    <h2 class="h2 text-white">DX encantador do local à produção</h2>
+                    <p class="mt-4 text-lg text-gray-400">
+                        As Funções de Borda são desenvolvidas usando Deno, um runtime de JavaScript de código aberto que garante máxima potência e flexibilidade.
+                    </p>
+                </div>
+
+                <div class="mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="card-glow bg-gray-900/40 border border-gray-800 rounded-xl p-8 scroll-animate">
+                        <h3 class="font-semibold text-lg text-white">Experiência de dev local</h3>
+                        <p class="text-gray-400 mt-2">
+                            Escreva código com recarregamento automático, autocompletar, verificação de tipos e linting.
+                        </p>
+                    </div>
+                    <div class="card-glow bg-gray-900/40 border border-gray-800 rounded-xl p-8 scroll-animate" style="animation-delay: 0.1s;">
+                        <h3 class="font-semibold text-lg text-white">Paridade Dev e Prod</h3>
+                        <p class="text-gray-400 mt-2">
+                            O mesmo runtime de código aberto executa suas funções localmente e em produção.
+                        </p>
+                    </div>
+                    <div class="card-glow bg-gray-900/40 border border-gray-800 rounded-xl p-8 scroll-animate" style="animation-delay: 0.2s;">
+                        <h3 class="font-semibold text-lg text-white">Use qualquer módulo NPM</h3>
+                        <p class="text-gray-400 mt-2">
+                            Aproveite os mais de 2 milhões de módulos no ecossistema Deno e NPM.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+         <!-- Seção de Integração com Ecossistema -->
+        <section id="integration-section" class="py-24 bg-black">
+            <div class="container mx-auto px-6 lg:px-16 xl:px-20 scroll-animate">
+                <h2 class="h2 text-white mb-12 max-w-2xl">Integra-se perfeitamente com o ecossistema Pitchutcha</h2>
+                <div class="flex flex-col lg:flex-row gap-12">
+                    <div class="lg:w-1/3">
+                        <ul class="space-y-2">
+                            <li><button data-tab="1" class="integration-tab text-left w-full p-4 rounded-lg transition-colors bg-gray-900 text-white">
+                                <h3 class="font-mono text-sm uppercase">Configuração Zero</h3>
+                                <p class="text-gray-400 text-sm mt-2">Variáveis de ambiente pré-populadas para acessar seu projeto.</p>
+                            </button></li>
+                            <li><button data-tab="2" class="integration-tab text-left w-full p-4 rounded-lg transition-colors hover:bg-gray-900 text-gray-400 hover:text-white">
+                                <h3 class="font-mono text-sm uppercase">Conecte-se ao seu BD</h3>
+                                <p class="text-gray-400 text-sm mt-2">Conecte-se ao seu banco de dados Postgres usando o cliente pitchutcha-js.</p>
+                            </button></li>
+                            <li><button data-tab="3" class="integration-tab text-left w-full p-4 rounded-lg transition-colors hover:bg-gray-900 text-gray-400 hover:text-white">
+                                <h3 class="font-mono text-sm uppercase">Funciona com Auth</h3>
+                                <p class="text-gray-400 text-sm mt-2">Projetado para funcionar perfeitamente com a Autenticação Pitchutcha.</p>
+                            </button></li>
+                        </ul>
+                    </div>
+                    <div class="lg:w-2/3 relative h-96">
+                        <div id="tab-content-1" class="tab-content bg-gray-900 border border-gray-800 rounded-xl p-4 font-mono text-sm text-gray-300 absolute w-full h-full">
+                            <pre><code class="language-js">import { createClient } from '@pitchutcha/pitchutcha-js'
+
+// Variáveis de ambiente são injetadas automaticamente
+const pitchutcha = createClient(
+  Deno.env.get('PITCHUTCHA_URL')!,
+  Deno.env.get('PITCHUTCHA_ANON_KEY')!
+)
+
+// Agora você pode usar o cliente para interagir com seu projeto
+const { data, error } = await pitchutcha.from('users').select()
+</code></pre>
+                        </div>
+                        <div id="tab-content-2" class="tab-content bg-gray-900 border border-gray-800 rounded-xl p-4 font-mono text-sm text-gray-300 hidden absolute w-full h-full">
+                            <pre><code class="language-js">import { serve } from 'https://deno.land/std@0.131.0/http/server.ts'
+import { createClient } from '@pitchutcha/pitchutcha-js'
+
+serve(async (req) => {
+  const pitchutcha = createClient(/*...*/)
+  const { data: { users } } = await pitchutcha.from('profiles').select('*')
+  
+  return new Response(
+    JSON.stringify(users),
+    { headers: { 'Content-Type': 'application/json' } }
+  )
+})
+</code></pre>
+                        </div>
+                        <div id="tab-content-3" class="tab-content bg-gray-900 border border-gray-800 rounded-xl p-4 font-mono text-sm text-gray-300 hidden absolute w-full h-full">
+                            <pre><code class="language-js">import { serve } from 'https://deno.land/std@0.131.0/http/server.ts'
+import { createClient } from '@pitchutcha/pitchutcha-js'
+
+serve(async (req) => {
+  const pitchutcha = createClient(
+    Deno.env.get('PITCHUTCHA_URL')!,
+    Deno.env.get('PITCHUTCHA_ANON_KEY')!,
+    { global: { headers: { Authorization: req.headers.get('Authorization')! } } }
+  )
+
+  const { data: { user } } = await pitchutcha.auth.getUser()
+  // ...
+})
+</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Seção Final (CTA) -->
+        <section class="py-24">
+            <div class="container mx-auto px-6 lg:px-16 xl:px-20 text-center scroll-animate">
+                <h2 class="h2 text-white">Pronto para começar a construir?</h2>
+                <p class="mt-4 text-lg text-gray-400 max-w-xl mx-auto">
+                    Junte-se a milhares de desenvolvedores que constroem o futuro da web com a Pitchutcha.
+                </p>
+                <div class="mt-8 flex justify-center flex-wrap gap-4">
+                    <button class="px-6 py-3 text-base rounded-md bg-[--brand-color] text-black font-semibold hover:bg-opacity-80 transition-opacity">Comece gratuitamente</button>
+                    <button class="px-6 py-3 text-base rounded-md bg-gray-900 hover:bg-gray-800 border border-gray-700 transition-colors">Contatar Enterprise</button>
+                </div>
+            </div>
+        </section>
+    </main>
     
-    <footer class="bg-slate-900/50 border-t border-border-color mt-20">
-      <div class="w-full border-b border-border-color"><div class="container mx-auto px-6 py-6 grid grid-cols-2 md:flex items-center justify-between gap-8 text-sm"><div class="flex flex-col md:flex-row gap-2 md:items-center col-span-2">We protect your data.<a class="text-[var(--brand-color)] hover:underline" href="#">More on Security</a></div><div class="flex items-center gap-2"><svg class="w-4 h-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>SOC2 Type 2</div><div class="flex items-center gap-2"><svg class="w-4 h-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>HIPAA Compliant</div></div></div>
-      <div class="container mx-auto px-6 py-12">
-          <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8">
-            <div class="col-span-2 lg:col-span-2">...</div>
-            ...
-          </div>
-          <div class="mt-12 border-t border-border-color pt-8 flex flex-col sm:flex-row justify-between items-center text-sm text-gray-400"><p>&copy; 2025 Supabase Inc.</p></div>
-      </div>
-  </footer>
+    <!-- Rodapé -->
+    <footer class="bg-black border-t border-gray-900">
+        <div class="container mx-auto px-6 lg:px-16 xl:px-20 py-16">
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8">
+                <div class="col-span-2 lg:col-span-2">
+                     <a href="#" class="flex items-center space-x-2">
+                        <svg role="img" aria-label="Logo da Pitchutcha" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="text-[--brand-color]">
+                            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span class="font-bold text-xl text-white">Pitchutcha</span>
+                    </a>
+                </div>
+                <div>
+                    <h6 class="font-semibold text-white">Produto</h6>
+                    <ul class="mt-4 space-y-2">
+                        <li><a href="#" class="text-sm text-gray-400 hover:text-white">Banco de Dados</a></li>
+                        <li><a href="#" class="text-sm text-gray-400 hover:text-white">Autenticação</a></li>
+                        <li><a href="#" class="text-sm text-gray-400 hover:text-white">Funções</a></li>
+                        <li><a href="#" class="text-sm text-gray-400 hover:text-white">Armazenamento</a></li>
+                    </ul>
+                </div>
+                 <div>
+                    <h6 class="font-semibold text-white">Recursos</h6>
+                    <ul class="mt-4 space-y-2">
+                        <li><a href="#" class="text-sm text-gray-400 hover:text-white">Blog</a></li>
+                        <li><a href="#" class="text-sm text-gray-400 hover:text-white">Suporte</a></li>
+                        <li><a href="#" class="text-sm text-gray-400 hover:text-white">Status do Sistema</a></li>
+                        <li><a href="#" class="text-sm text-gray-400 hover:text-white">Segurança</a></li>
+                    </ul>
+                </div>
+                 <div>
+                    <h6 class="font-semibold text-white">Desenvolvedores</h6>
+                    <ul class="mt-4 space-y-2">
+                        <li><a href="#" class="text-sm text-gray-400 hover:text-white">Documentação</a></li>
+                        <li><a href="#" class="text-sm text-gray-400 hover:text-white">Changelog</a></li>
+                        <li><a href="#" class="text-sm text-gray-400 hover:text-white">Código Aberto</a></li>
+                    </ul>
+                </div>
+                 <div>
+                    <h6 class="font-semibold text-white">Empresa</h6>
+                    <ul class="mt-4 space-y-2">
+                        <li><a href="#" class="text-sm text-gray-400 hover:text-white">Sobre</a></li>
+                        <li><a href="#" class="text-sm text-gray-400 hover:text-white">Carreiras</a></li>
+                        <li><a href="#" class="text-sm text-gray-400 hover:text-white">Termos de Serviço</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mt-16 border-t border-gray-800 pt-8 text-center text-sm text-gray-500">
+                <p>&copy; 2025 Pitchutcha Inc. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
 
-  <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
 
-      const commandElement = document.getElementById('command-line-text');
-      const commandText = 'supabase functions serve';
-      let i = 0;
-      function typeWriter() {
-        if (i < commandText.length) { commandElement.innerHTML += commandText.charAt(i); i++; setTimeout(typeWriter, 80); } 
-        else { setTimeout(() => { i = 0; commandElement.innerHTML = ''; typeWriter(); }, 5000); }
-      }
-      typeWriter();
+<script>
+document.addEventListener('DOMContentLoaded', () => {
 
-      new Swiper('.swiper-container', { loop: true, slidesPerView: 1, spaceBetween: 30, autoplay: { delay: 4000, disableOnInteraction: false }, breakpoints: { 640: { slidesPerView: 2 }, 1024: { slidesPerView: 3 } } });
-      
-      const tabButtons = document.querySelectorAll('.tab-button');
-      tabButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const tabId = button.dataset.tab;
-            tabButtons.forEach(btn => {btn.classList.remove('tab-active'); btn.style.flexGrow = 1;});
-            button.classList.add('tab-active');
-            document.querySelectorAll('.tab-content').forEach(content => content.id === tabId ? content.classList.remove('hidden') : content.classList.add('hidden'));
-        });
-      });
+    // Lógica do Globo Animado
+    const canvas = document.getElementById('globe-canvas');
+    if (canvas) {
+        const ctx = canvas.getContext('2d');
+        let width, height, radius, particles;
 
-      const verticalTabsNav = document.getElementById('vertical-tabs-nav');
-      const verticalTabButtons = verticalTabsNav.querySelectorAll('.vertical-tab-button');
-      verticalTabButtons[0].classList.add('vertical-tab-active');
-      verticalTabButtons[0].querySelector('p').style.maxHeight = '100px';
-      verticalTabButtons[0].querySelector('p').style.opacity = '1';
+        function setup() {
+            const container = canvas.parentElement;
+            width = container.offsetWidth;
+            height = container.offsetHeight;
+            canvas.width = width * 2; // Aumentar resolução para telas retina
+            canvas.height = height * 2;
+            ctx.scale(2, 2);
+            
+            radius = Math.min(width, height) * 0.4;
+            particles = [];
+            const particleCount = 200;
+            const connectionCount = 4;
+            
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(createParticle());
+            }
 
-      verticalTabButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const tabId = button.dataset.tab;
-            verticalTabButtons.forEach(btn => {
-                btn.classList.remove('vertical-tab-active');
-                const p = btn.querySelector('p');
-                p.style.maxHeight = '0px';
-                p.style.opacity = '0';
+            for (let i = 0; i < connectionCount; i++) {
+                createConnection();
+            }
+        }
+
+        function createParticle() {
+            const phi = Math.random() * 2 * Math.PI;
+            const theta = Math.acos((Math.random() * 2) - 1);
+            const speed = 0.0005 + Math.random() * 0.001;
+            return { phi, theta, speed };
+        }
+
+        function createConnection() {
+            const startParticle = particles[Math.floor(Math.random() * particles.length)];
+            const endParticle = particles[Math.floor(Math.random() * particles.length)];
+            
+            const connection = {
+                start: startParticle,
+                end: endParticle,
+                progress: 0,
+                speed: 0.005 + Math.random() * 0.01,
+                color: `hsla(158, 56%, 58%, ${0.3 + Math.random() * 0.4})`
+            };
+            particles.push(connection);
+        }
+        
+        function project(phi, theta) {
+            const x = radius * Math.sin(theta) * Math.cos(phi);
+            const y = radius * Math.sin(theta) * Math.sin(phi);
+            const z = radius * Math.cos(theta);
+            
+            const scale = 1 + z / (radius * 2);
+
+            return {
+                x: width / 2 + x * scale,
+                y: height / 2 + y * scale,
+                scale: Math.max(0, scale),
+                alpha: Math.max(0.1, scale)
+            };
+        }
+
+        let rotation = 0;
+        function draw() {
+            if (!ctx) return;
+            ctx.clearRect(0, 0, width, height);
+            rotation += 0.001;
+
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.lineWidth = 0.5;
+
+            for (let i = 0; i < 12; i++) {
+                ctx.beginPath();
+                for (let j = 0; j <= 100; j++) {
+                    const p = project(rotation + (i * Math.PI / 6), j * Math.PI / 100);
+                    if (j === 0) ctx.moveTo(p.x, p.y);
+                    else ctx.lineTo(p.x, p.y);
+                }
+                ctx.stroke();
+
+                ctx.beginPath();
+                for (let j = 0; j <= 100; j++) {
+                    const p = project(rotation + j * Math.PI / 50, i * Math.PI / 12);
+                    if (j === 0) ctx.moveTo(p.x, p.y);
+                    else ctx.lineTo(p.x, p.y);
+                }
+                ctx.stroke();
+            }
+
+            particles.forEach((p, i) => {
+                if (p.progress !== undefined) {
+                    p.progress += p.speed;
+                    if (p.progress >= 1) {
+                        particles[i] = createConnection();
+                    } else {
+                        const currentPhi = p.start.phi + (p.end.phi - p.start.phi) * p.progress;
+                        const currentTheta = p.start.theta + (p.end.theta - p.start.theta) * p.progress;
+                        
+                        const proj = project(rotation + currentPhi, currentTheta);
+                        
+                        ctx.beginPath();
+                        ctx.arc(proj.x, proj.y, 1.5 * proj.scale, 0, 2 * Math.PI);
+                        ctx.fillStyle = p.color;
+                        ctx.fill();
+                    }
+                } else {
+                    p.phi += p.speed;
+                    const proj = project(rotation + p.phi, p.theta);
+                    
+                    ctx.beginPath();
+                    ctx.arc(proj.x, proj.y, 0.8 * proj.scale, 0, 2 * Math.PI);
+                    ctx.fillStyle = `rgba(255, 255, 255, ${proj.alpha * 0.5})`;
+                    ctx.fill();
+                }
             });
-            button.classList.add('vertical-tab-active');
-            const p = button.querySelector('p');
-            p.style.maxHeight = '100px';
-            p.style.opacity = '1';
-            document.querySelectorAll('.vertical-tab-content').forEach(content => content.id === tabId ? content.classList.remove('hidden') : content.classList.add('hidden'));
+
+            requestAnimationFrame(draw);
+        }
+        
+        setup();
+        draw();
+        window.addEventListener('resize', setup);
+    }
+
+    // Lógica para animação de scroll
+    const animatedElements = document.querySelectorAll('.scroll-animate');
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('fade-in-up');
+                observer.unobserve(entry.target);
+            }
         });
-      });
-      
-      const observer = new IntersectionObserver((entries) => { entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('visible'); entry.target.style.transitionDelay = `${parseInt(entry.target.style.getPropertyValue("--delay")) || 0}ms`; } }); }, { threshold: 0.1 });
-      document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
-      
-      // Preencher o restante do código que foi omitido por brevidade
-      // ... (código da roda de produtos, syntax highlight, etc.)
+    }, {
+        threshold: 0.1
     });
-  </script>
+
+    animatedElements.forEach(el => observer.observe(el));
+    
+    // Lógica do brilho do card
+    const cards = document.querySelectorAll('.card-glow');
+    cards.forEach(card => {
+        card.addEventListener('mousemove', e => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            card.style.setProperty('--mouse-x', `${x}px`);
+            card.style.setProperty('--mouse-y', `${y}px`);
+        });
+    });
+
+    // Lógica do botão de copiar
+    const cliCommand = document.getElementById('cli-command');
+    if(cliCommand) {
+        cliCommand.addEventListener('click', () => {
+            const commandText = document.getElementById('cli-command-text').innerText;
+            navigator.clipboard.writeText(commandText).then(() => {
+                const copyButton = cliCommand.querySelector('button');
+                const originalIcon = copyButton.innerHTML;
+                copyButton.innerHTML = `<svg class="w-4 h-4 text-[--brand-color]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
+                setTimeout(() => { copyButton.innerHTML = originalIcon; }, 1500);
+            });
+        });
+    }
+    
+    // Lógica do Carrossel
+    var buildCarousel = new Swiper('.build-carousel', {
+        slidesPerView: 1.2,
+        spaceBetween: 20,
+        breakpoints: {
+            640: {
+                slidesPerView: 2,
+                spaceBetween: 20,
+            },
+            1024: {
+                slidesPerView: 3,
+                spaceBetween: 30,
+            },
+        },
+        navigation: {
+            nextEl: '.carousel-next',
+            prevEl: '.carousel-prev',
+        },
+    });
+
+    // Lógica das abas de Integração
+    const integrationSection = document.getElementById('integration-section');
+    if (integrationSection) {
+        const tabs = integrationSection.querySelectorAll('.integration-tab');
+        const contents = integrationSection.querySelectorAll('.tab-content');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const targetId = tab.dataset.tab;
+
+                tabs.forEach(t => {
+                    t.classList.remove('bg-gray-900', 'text-white');
+                    t.classList.add('hover:bg-gray-900', 'text-gray-400', 'hover:text-white');
+                });
+                tab.classList.add('bg-gray-900', 'text-white');
+                tab.classList.remove('hover:bg-gray-900', 'text-gray-400', 'hover:text-white');
+
+                contents.forEach(content => {
+                    if (content.id === `tab-content-${targetId}`) {
+                        content.classList.remove('hidden');
+                    } else {
+                        content.classList.add('hidden');
+                    }
+                });
+            });
+        });
+    }
+
+});
+</script>
 
 </body>
 </html>
